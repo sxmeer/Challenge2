@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Document</title>
+</head>
+
+<body>
+    <div>
+        <canvas id="my-canvas" height="400" width="400" style="border: 5px solid black"></canvas>
+    </div>
+    <div>
+        <label for="height">Height:</label><input type="number" id="height">
+        <label for="width">Width:</label><input type="number" id="width">
+        <button onclick="changeSize()">change size</button>
+        <form>
+            <input type="radio" name="option" value="draw" checked onclick="changeColor(event)" /> Draw<br />
+            <input type="radio" name="option" value="erase" onclick="changeColor(event)" /> Erase<br />
+            <input type="color" onchange="changeColors(event)">
+        </form>
+    </div>
+    <a id="download" download="image.png">
+        <button onclick="download()">Download</button>
+    </a>
+    <button onclick="clearTheMess()">Clear the mess</button>
+    <script>
+        var canvas = document.getElementById("my-canvas");
+        var context = canvas.getContext("2d");
+        context.lineWidth = 10;
+        context.lineCap = "square";
+        let imageDraw = false;
+
+        let drawColor = "#000000";
+        let eraseColor = "#FFFFFF"
+
+        function changeColor(event) {
+            if (event.toElement.value == "draw") {
+                context.strokeStyle = drawColor
+            } else
+            if (event.toElement.value == "erase") {
+                context.strokeStyle = eraseColor
+            }
+        }
+
+        function changeColors(event) {
+            drawColor = event.srcElement.value;
+            context.strokeStyle = drawColor;
+        }
+
+        function clearTheMess() {
+            context.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function changeSize() {
+            var height = document.getElementById("height").value
+            var width = document.getElementById("width").value
+            if (height <= 200) {
+                canvas.height = 200
+            } else if (height >= window.innerHeight) {
+                canvas.height = window.innerHeight - 200;
+            } else {
+                canvas.height = height;
+            }
+            if (width <= 200) {
+                canvas.width = 200
+            } else if (width >= window.innerWidth) {
+                canvas.width = window.innerWidth;
+            } else {
+                canvas.width = width;
+            }
+        }
+
+        function download() {
+            var download = document.getElementById("download");
+            var image = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            download.setAttribute("href", image);
+        }
+
+        function startDrawing(event) {
+            imageDraw = true;
+            draw(event);
+        }
+
+        function endDrawing() {
+            imageDraw = false;
+            context.beginPath();
+        }
+
+        function draw(event) {
+            if (!imageDraw) return;
+            context.lineTo(event.clientX, event.clientY);
+            context.stroke();
+        }
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mouseup", endDrawing);
+    </script>
+</body>
+
+</html>
